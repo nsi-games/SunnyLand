@@ -3,7 +3,13 @@ using UnityEngine.Events;
 
 public class CharacterController2D : MonoBehaviour
 {
-    [SerializeField] private float m_JumpForce = 5f;                          // Amount of force added when the player jumps.
+    /* 
+     * --- C# TIP ---
+     * Use SerializeField to expose private variables
+     * Private variables are not accessible through other scripts but will display in the Inspector
+    */
+
+    // Member Variables
     [Range(0, .3f)] [SerializeField] private float m_MovementSmoothing = .05f;  // How much to smooth out the movement
     [SerializeField] private bool m_AirControl = false;                         // Whether or not a player can steer while jumping;
     [SerializeField] private LayerMask m_WhatIsGround;                          // A mask determining what is ground to the character
@@ -14,17 +20,19 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField] private float m_GroundRayLength = .2f;                     // Length of the ray beneith controller
     [SerializeField] private float m_LadderRayLength = .5f;                     // Length of the ray above controller
 
+    
     private float m_OriginalGravityScale;
     private bool m_FacingRight = true;  // For determining which way the player is currently facing.
     
     [Header("Events")]
-    [Space]
     public UnityEvent OnLandEvent;
 
+    // Public Getters / Setters (Parameters)
     public bool IsGrounded { get; private set; }
     public bool IsClimbing { get; private set; }
-    public Rigidbody2D Rigidbody { get; set; }
+    public Rigidbody2D Rigidbody { get; private set; }
 
+    // Internal Methods
     private void Awake()
     {
         Rigidbody = GetComponent<Rigidbody2D>();
@@ -33,7 +41,6 @@ public class CharacterController2D : MonoBehaviour
         if (OnLandEvent == null)
             OnLandEvent = new UnityEvent();
     }
-
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
@@ -47,7 +54,6 @@ public class CharacterController2D : MonoBehaviour
         Ray ladderRay = new Ray(m_LadderCheck.position, Vector3.up);
         Gizmos.DrawLine(ladderRay.origin, ladderRay.origin + ladderRay.direction * m_LadderRayLength);
     }
-
     private void FixedUpdate()
     {
         bool wasGrounded = IsGrounded;
@@ -66,9 +72,20 @@ public class CharacterController2D : MonoBehaviour
             }
         }
     }
+    private void Flip()
+    {
+        // Switch the way the player is labelled as facing.
+        m_FacingRight = !m_FacingRight;
 
+        // Multiply the player's x local scale by -1.
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
+    }
+    
+    // >> Custom methods go here <<
 
-    public void Move(float offsetX, float offsetY)
+    public void Climb(float offsetY)
     {
         RaycastHit2D ladderHit = Physics2D.Raycast(m_LadderCheck.position, Vector2.up, m_LadderRayLength, m_WhatIsLadder);
         if (ladderHit.collider != null)
@@ -92,7 +109,22 @@ public class CharacterController2D : MonoBehaviour
         {
             Rigidbody.gravityScale = m_OriginalGravityScale;
         }
+    }
+    public void Jump(float height)
+    {
+        // If the player should jump...
+        if (IsGrounded)
+        {
+            // Add a vertical force to the player.
+            IsGrounded = false;
+            Rigidbody.AddForce(new Vector2(0f, height), ForceMode2D.Impulse);
+        }
+    }
 
+
+    // Move must be called last!
+    public void Move(float offsetX)
+    {
         //only control the player if grounded or airControl is turned on
         if (IsGrounded || m_AirControl)
         {
@@ -133,28 +165,5 @@ public class CharacterController2D : MonoBehaviour
                 Flip();
             }
         }
-    }
-
-    public void Jump()
-    {
-        // If the player should jump...
-        if (IsGrounded)
-        {
-            // Add a vertical force to the player.
-            IsGrounded = false;
-            Rigidbody.AddForce(new Vector2(0f, m_JumpForce), ForceMode2D.Impulse);
-        }
-    }
-
-
-    private void Flip()
-    {
-        // Switch the way the player is labelled as facing.
-        m_FacingRight = !m_FacingRight;
-
-        // Multiply the player's x local scale by -1.
-        Vector3 theScale = transform.localScale;
-        theScale.x *= -1;
-        transform.localScale = theScale;
     }
 }

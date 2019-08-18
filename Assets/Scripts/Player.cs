@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class Player : MonoBehaviour
 {
+    public float jumpHeight = 5f;
     public float climbSpeed = 10f;
     public float moveSpeed = 10f;
 
@@ -12,6 +13,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        // Gather components at the start of the game to save processing! (Cache-ing)
         controller = GetComponent<CharacterController2D>();
         rend = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
@@ -19,35 +21,38 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        // Gathers Left and Right input
+        /* 
+         * --- Unity Tip ---
+         * Input.GetAxis returns a value between -1 to 1 (with smoothing applied)
+         * Input.GetAxisRaw returns either -1 or 1 rounded number (no smoothing)
+         */
+
+        // Inputs
         float inputH = Input.GetAxisRaw("Horizontal");
-        // Gathers Up and Down input
         float inputV = Input.GetAxisRaw("Vertical");
-        // Get Spacebar input
         bool isJumping = Input.GetButtonDown("Jump");
-        // Set bool to true is input is pressed
         bool isRunning = inputH != 0;
         
-        // 1.
+        // Animations
         anim.SetBool("IsGrounded", controller.IsGrounded);
-        // 2. 
         anim.SetBool("IsClimbing", controller.IsClimbing);
-        // 3.
         anim.SetFloat("JumpY", controller.Rigidbody.velocity.y);
-        // 4.
         anim.SetFloat("ClimbSpeed", inputV);
-        // 5. Animate the player to running if input is pressed
         anim.SetBool("IsRunning", isRunning);
 
-        //Move(inputH);
-        //Climb(inputV);
-
-        Vector3 movement = new Vector3(inputH * moveSpeed, inputV * climbSpeed) * Time.deltaTime;
-        controller.Move(movement.x, movement.y);
-
-        if(isJumping)
+        if (isJumping)
         {
-            controller.Jump();
+            controller.Jump(jumpHeight);
         }
+
+        // Horizontal & Vertical Movement
+        float horizontal = inputH * moveSpeed;
+        float vertical = inputV * climbSpeed;
+
+        // Climb with Vertical Inputs
+        controller.Climb(vertical);
+
+        // Move with Horizontal Inputs
+        controller.Move(horizontal); // CharacterController2D.Move must be last!
     }
 }
