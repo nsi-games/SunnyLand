@@ -8,15 +8,11 @@ public class Player : MonoBehaviour
     public float moveSpeed = 10f;
 
     private CharacterController2D controller;
-    private SpriteRenderer rend;
-    private Animator anim;
-
+    
     void Start()
     {
         // Gather components at the start of the game to save processing! (Cache-ing)
         controller = GetComponent<CharacterController2D>();
-        rend = GetComponent<SpriteRenderer>();
-        anim = GetComponent<Animator>();
     }
 
     void Update()
@@ -33,13 +29,6 @@ public class Player : MonoBehaviour
         bool isJumping = Input.GetButtonDown("Jump");
         bool isRunning = inputH != 0;
         
-        // Animations
-        anim.SetBool("IsGrounded", controller.IsGrounded);
-        anim.SetBool("IsClimbing", controller.IsClimbing);
-        anim.SetFloat("JumpY", controller.Rigidbody.velocity.y);
-        anim.SetFloat("ClimbSpeed", inputV);
-        anim.SetBool("IsRunning", isRunning);
-
         if (isJumping)
         {
             controller.Jump(jumpHeight);
