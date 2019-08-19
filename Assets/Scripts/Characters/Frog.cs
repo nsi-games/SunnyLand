@@ -6,23 +6,16 @@ public class Frog : MonoBehaviour
     private CharacterController2D character;
     private IState state;
 
-    private Animator anim;
-
     private void Awake()
     {
-        anim = GetComponent<Animator>();
         character = GetComponent<CharacterController2D>();
         // Start in the Idle State
-        state = new IdleState(this);
+        state = new Idle(this);
     }
-
     private void Update()
     {
         // Update Frog's State
         state.Update();
-
-        anim.SetBool("IsGrounded", character.IsGrounded);
-        anim.SetFloat("JumpY", character.Rigidbody.velocity.y);
     }
 
     #region State Machine
@@ -36,70 +29,62 @@ public class Frog : MonoBehaviour
         {
             Owner = owner;
         }
-
         protected TOwner Owner { get; private set; }
-
         public abstract void Update();
     }
-    private class IdleState : State<Frog>
+    private class Idle : State<Frog>
     {
         private float elapsed;
-
-        public IdleState(Frog owner, float time = 2.5f) : base(owner)
+        public Idle(Frog owner, float time = 2.5f) : base(owner)
         {
             elapsed = time;
         }
-
         public override void Update()
         {
             elapsed -= Time.deltaTime;
 
             if (elapsed <= 0)
             {
-                Owner.state = new ThinkState(Owner);
+                Owner.state = new Think(Owner);
             }
         }
     }
-    private class FlipState : State<Frog>
+    private class Flip : State<Frog>
     {
-        public FlipState(Frog owner) : base(owner) { }
-
+        public Flip(Frog owner) : base(owner) { }
         public override void Update()
         {
             Owner.character.Flip();
-            Owner.state = new ThinkState(Owner);
+            Owner.state = new Think(Owner);
         }
     }
-    private class ThinkState : State<Frog>
+    private class Think : State<Frog>
     {
-        public ThinkState(Frog owner) : base(owner) { }
-
+        public Think(Frog owner) : base(owner) { }
         public override void Update()
         {
             var state = Random.Range(0, 7);
 
             if (state <= 1)
             {
-                Owner.state = new IdleState(Owner);
+                Owner.state = new Idle(Owner);
             }
             else if (state <= 3)
             {
-                Owner.state = new FlipState(Owner);
+                Owner.state = new Flip(Owner);
             }
             else
             {
-                Owner.state = new JumpState(Owner);
+                Owner.state = new Jump(Owner);
             }
         }
     }
-    private class JumpState : State<Frog>
+    private class Jump : State<Frog>
     {
         public float leap = 3f;
         public float height = 1f;
         private float airElapsed = .3f;
-
-        public JumpState(Frog owner) : base(owner) {}
-
+        public Jump(Frog owner) : base(owner) {}
         public override void Update()
         {
             var character = Owner.character;
@@ -108,7 +93,7 @@ public class Frog : MonoBehaviour
             
             if (airElapsed < 0 && character.IsGrounded)
             {
-                Owner.state = new ThinkState(Owner);
+                Owner.state = new Think(Owner);
             }
             else
             {
