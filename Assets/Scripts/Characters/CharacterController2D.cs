@@ -166,8 +166,7 @@ public class CharacterController2D : MonoBehaviour
             Rigidbody.AddForce(new Vector2(0f, height), ForceMode2D.Impulse);
         }
     }
-
-
+    
     // Move must be called last!
     public void Move(float offsetX)
     {
@@ -196,6 +195,7 @@ public class CharacterController2D : MonoBehaviour
                     }
                 }
             }
+
             // Move the character by finding the target velocity
             Vector3 targetVelocity = new Vector2(offsetX, Rigidbody.velocity.y);
 
