@@ -1,47 +1,45 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+
+[RequireComponent(typeof(CharacterController2D))]
 public class Player : MonoBehaviour
 {
-    public float jumpHeight = 5f;
-    public float climbSpeed = 10f;
-    public float moveSpeed = 10f;
+    public float jumpHeight = 5f;   // How high the Character Jumps (in units)
+    public float climbSpeed = 10f;  // How fast the Character Climbs
+    public float moveSpeed = 10f;   // How fast the Character Moves
 
     private CharacterController2D controller;
-    
+
+    // Start is called before the first frame update
     void Start()
     {
         // Gather components at the start of the game to save processing! (Cache-ing)
         controller = GetComponent<CharacterController2D>();
     }
 
+    // Update is called once per frame
     void Update()
     {
-        /* 
+        /*
          * --- Unity Tip ---
-         * Input.GetAxis returns a value between -1 to 1 (with smoothing applied)
-         * Input.GetAxisRaw returns either -1 or 1 rounded number (no smoothing)
+         * Input.GetAxis - 
+         * Input.GetAxisRaw - 
          */
 
-        // Inputs
-        float inputH = Input.GetAxisRaw("Horizontal");
-        float inputV = Input.GetAxisRaw("Vertical");
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
         bool isJumping = Input.GetButtonDown("Jump");
-        bool isRunning = inputH != 0;
-        
+
         if (isJumping)
         {
             controller.Jump(jumpHeight);
         }
 
-        // Horizontal & Vertical Movement
-        float horizontal = inputH * moveSpeed;
-        float vertical = inputV * climbSpeed;
+        controller.Climb(vertical * climbSpeed);
 
-        // Climb with Vertical Inputs
-        controller.Climb(vertical);
-
-        // Move with Horizontal Inputs
-        controller.Move(horizontal); // CharacterController2D.Move must be last!
+        // Move controller horizontally
+        controller.Move(horizontal * moveSpeed);
     }
 }

@@ -166,8 +166,11 @@ public class CharacterController2D : MonoBehaviour
             Rigidbody.AddForce(new Vector2(0f, height), ForceMode2D.Impulse);
         }
     }
-    
-    // Move must be called last!
+
+    /// <summary>
+    /// Move must be called last!
+    /// </summary>
+    /// <param name="offsetX">Movement offset Horizontally</param>
     public void Move(float offsetX)
     {
         if (HasParameter("IsRunning", Anim))
