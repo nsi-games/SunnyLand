@@ -105,11 +105,11 @@ public class CharacterController2D : MonoBehaviour
 
     private void AnimateDefault()
     {
-        if(HasParameter("IsGrounded", Anim))
-            Anim.SetBool("IsGrounded", IsGrounded);
-
-        if(HasParameter("IsClimbing", Anim))
+        if (HasParameter("IsClimbing", Anim))
             Anim.SetBool("IsClimbing", IsClimbing);
+
+        if (HasParameter("IsGrounded", Anim))
+            Anim.SetBool("IsGrounded", IsGrounded);
 
         if(HasParameter("JumpY", Anim))
             Anim.SetFloat("JumpY", Rigidbody.velocity.y);

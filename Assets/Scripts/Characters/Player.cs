@@ -42,4 +42,17 @@ public class Player : MonoBehaviour
         // Move controller horizontally
         controller.Move(horizontal * moveSpeed);
     }
+
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        // Detect hitting item
+        if (col.gameObject.tag == "Item")
+        {
+            //  Add 1 to score
+            GameManager.Instance.AddScore(1);
+            //  Play chime sound - Requires an Audio Source
+            //  Destroy item
+            Destroy(col.gameObject);
+        }
+    }
 }
